@@ -14,6 +14,3 @@ data bot connects to sqlite databases and uses gpt-3.5 to construct sql queries 
 
 you will need to enter the path to your database when propmted, this path should not include the ```sqlite://``` prefix
 once the database has successfully connected, ask your questions and start exploring the database.
-
-chat_bot contains an ai error handleing system, it is currently possible for the ai to become stuck in a correcting loop.
-if you encounter a never ending loop abort the application with ```ctrl-c```
