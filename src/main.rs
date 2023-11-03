@@ -83,7 +83,12 @@ async fn main() -> Result<(), Box<dyn Error>>{
             .replace("\\\\", "\\")
             .to_string();
         let mut query_result = DataBase::query(db.clone(), sql_query.clone(), "fetch".to_string()).await;
-        while query_result.is_err(){
+        
+        // if query fails, attempt to correct
+        let correction_attempts_allowed = 5;
+        let mut correction_attempts = 0;
+        while query_result.is_err() && correction_attempts < correction_attempts_allowed{
+            correction_attempts += 1;
             styled_println(Color::Red, Color::Reset, "sql query error, attempting to correct ...")?;
             let correction = bot.query_error(
                 format!("the following sql query returns the error: {}", query_result.err().unwrap()),
@@ -100,7 +105,12 @@ async fn main() -> Result<(), Box<dyn Error>>{
                 .to_string();
             query_result = DataBase::query(db.clone(), correction, "fetch".to_string()).await;
         }
-        DataBase::pretty_print_data(query_result.unwrap());
+        if query_result.is_ok(){
+            DataBase::pretty_print_data(query_result.unwrap());
+        }else{
+            styled_println(Color::Red, Color::Reset, format!("sql query error: {}", query_result.err().unwrap()).as_str())?;
+            styled_println(Color::Magenta, Color::Reset, "The provided query was not able to be interperted, please try again")?;
+        }
     }
 
     Ok(())
